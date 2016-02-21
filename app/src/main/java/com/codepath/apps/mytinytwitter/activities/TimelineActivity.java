@@ -47,6 +47,9 @@ public class TimelineActivity extends AppCompatActivity {
     private TimelineAdapter adapter;
     private TwitterClient twitterClient;
 
+    private int tweetsCount = 20;
+    private String nextMaxId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +76,7 @@ public class TimelineActivity extends AppCompatActivity {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                fetchTimelineAsync(0);
+                fetchTimelineAsync();
             }
         });
         // Configure the refreshing colors
@@ -95,20 +98,25 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                populateTimeline(page);
+                Tweet lastTweet = tweetList.get(tweetList.size() - 1);
+                nextMaxId = lastTweet.getIdStr();
+                populateTimeline(tweetsCount, nextMaxId);
             }
         });
         /********************** end of RecyclerView **********************/
 
         twitterClient = TwitterApplication.getRestClient(); // singleton client
-        populateTimeline(0);
+        // first request
+        // from dev.twitter.com:
+        // To use max_id correctly, an application’s first request to a timeline endpoint should only specify a count.
+        populateTimeline(tweetsCount, null);
     }
 
-    private void fetchTimelineAsync(final int i) {
+    private void fetchTimelineAsync() {
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                populateTimeline(i);
+                populateTimeline(tweetsCount, null);
 
                 swipeContainer.setRefreshing(false);
             }
@@ -117,12 +125,12 @@ public class TimelineActivity extends AppCompatActivity {
 
     // 1. send an API request to get the timeline json
     // 2. fill the RecyclerView by creating the tweet objects from the json
-    private void populateTimeline(final int page) {
-        if (page == 0) {
+    private void populateTimeline(int count, String maxId) {
+        if (maxId == null || maxId.trim().isEmpty()) {
             adapter.clear();
         }
 
-        twitterClient.getHomeTimeline(new JsonHttpResponseHandler() {
+        twitterClient.getHomeTimeline(count, maxId, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
