@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Rest Client Template</string>
+    <string name="app_name">My Tiny Twitter</string>
     <string name="login_label">Log in</string>
+    <string name="title_activity_timeline">Home Timeline</string>
+
+    <string name="search">Search</string>
+    <string name="name">Name</string>
+    <string name="screen_name">Screen Name</string>
+    <string name="created_at">Created at</string>
 
 </resources>
