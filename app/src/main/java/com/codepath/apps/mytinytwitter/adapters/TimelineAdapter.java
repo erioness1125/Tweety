@@ -6,15 +6,18 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.codepath.apps.mytinytwitter.R;
+import com.codepath.apps.mytinytwitter.activities.TimelineActivity;
 import com.codepath.apps.mytinytwitter.models.Tweet;
 
 import java.text.ParseException;
@@ -55,10 +58,10 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        //this change height of rcv
-//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        params.height = 200; //height recycleviewer
-//        holder.itemView.setLayoutParams(params);
+        //this change height of RecyclerView
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, containerHeight((TimelineActivity) context));
+        holder.itemView.setLayoutParams(params);
 
         // Get the data model based on position
         Tweet tweet = tweetList.get(position);
@@ -129,6 +132,13 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
         }
 
         return relativeDate;
+    }
+
+    public static int containerHeight(TimelineActivity timelineActivity) {
+        DisplayMetrics dm = new DisplayMetrics();
+        timelineActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        return (int) (dm.heightPixels / 5.0);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

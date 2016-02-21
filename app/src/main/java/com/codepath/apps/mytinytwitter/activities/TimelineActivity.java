@@ -1,6 +1,5 @@
 package com.codepath.apps.mytinytwitter.activities;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,12 +14,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.TwitterApplication;
 import com.codepath.apps.mytinytwitter.TwitterClient;
 import com.codepath.apps.mytinytwitter.adapters.TimelineAdapter;
+import com.codepath.apps.mytinytwitter.listeners.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.mytinytwitter.models.Tweet;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -74,7 +73,7 @@ public class TimelineActivity extends AppCompatActivity {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-//                fetchTimelineAsync(0);
+                fetchTimelineAsync(0);
             }
         });
         // Configure the refreshing colors
@@ -90,16 +89,39 @@ public class TimelineActivity extends AppCompatActivity {
         // Attach the adapter to the RecyclerView to populate items
         rvTweets.setAdapter(adapter);
         // Set layout manager to position the items
-        rvTweets.setLayoutManager(new CustomLinearLayoutManager(this));
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvTweets.setLayoutManager(linearLayoutManager);
+        // Add the scroll listener
+        rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                populateTimeline(page);
+            }
+        });
         /********************** end of RecyclerView **********************/
 
         twitterClient = TwitterApplication.getRestClient(); // singleton client
-        populateTimeline();
+        populateTimeline(0);
+    }
+
+    private void fetchTimelineAsync(final int i) {
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                populateTimeline(i);
+
+                swipeContainer.setRefreshing(false);
+            }
+        }, 1000);
     }
 
     // 1. send an API request to get the timeline json
     // 2. fill the RecyclerView by creating the tweet objects from the json
-    private void populateTimeline() {
+    private void populateTimeline(final int page) {
+        if (page == 0) {
+            adapter.clear();
+        }
+
         twitterClient.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
@@ -109,19 +131,16 @@ public class TimelineActivity extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 String responseString = response.toString();
-                Type collectionType = new TypeToken<List<Tweet>>(){}.getType();
+                Type collectionType = new TypeToken<List<Tweet>>() {
+                }.getType();
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 // mapping camel case field names
                 gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
                 Gson gson = gsonBuilder.create();
-                List<Tweet> tweetList = gson.fromJson(responseString, collectionType);
+                tweetList = gson.fromJson(responseString, collectionType);
 
                 adapter.addAll(tweetList);
                 adapter.notifyDataSetChanged();
-//                Log.i("info", String.valueOf(tweetList.size()));
-//                for (Tweet tweet : tweetList) {
-//                    Log.i("info", tweet.getText());
-//                }
             }
         });
     }
@@ -151,78 +170,5 @@ public class TimelineActivity extends AppCompatActivity {
         });
 
         return true;
-    }
-
-    class CustomLinearLayoutManager extends LinearLayoutManager {
-
-        public CustomLinearLayoutManager(Context context) {
-            super(context);
-        }
-
-        public CustomLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
-            super(context, orientation, reverseLayout);
-        }
-
-        private int[] mMeasuredDimension = new int[2];
-
-        @Override
-        public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state,
-                              int widthSpec, int heightSpec) {
-//            final int widthMode = View.MeasureSpec.getMode(widthSpec);
-            final int heightMode = View.MeasureSpec.getMode(heightSpec);
-//            final int widthSize = View.MeasureSpec.getSize(widthSpec);
-            final int heightSize = View.MeasureSpec.getSize(heightSpec);
-//            int width = 0;
-            int height = 0;
-            for (int i = 0; i < getItemCount(); i++) {
-                measureScrapChild(recycler, i,
-                        View.MeasureSpec.makeMeasureSpec(i, View.MeasureSpec.UNSPECIFIED),
-                        View.MeasureSpec.makeMeasureSpec(i, View.MeasureSpec.UNSPECIFIED),
-                        mMeasuredDimension);
-
-                if (getOrientation() == HORIZONTAL) {
-//                    width = width + mMeasuredDimension[0];
-                    if (i == 0) {
-                        height = mMeasuredDimension[1];
-                    }
-                } else {
-                    height = height + mMeasuredDimension[1];
-//                    if (i == 0) {
-//                        width = mMeasuredDimension[0];
-//                    }
-                }
-            }
-//            switch (widthMode) {
-//                case View.MeasureSpec.EXACTLY:
-//                    width = widthSize;
-//                case View.MeasureSpec.AT_MOST:
-//                case View.MeasureSpec.UNSPECIFIED:
-//            }
-
-            switch (heightMode) {
-                case View.MeasureSpec.EXACTLY:
-                    height = heightSize;
-                case View.MeasureSpec.AT_MOST:
-                case View.MeasureSpec.UNSPECIFIED:
-            }
-
-            setMeasuredDimension(widthSpec, height);
-        }
-
-        private void measureScrapChild(RecyclerView.Recycler recycler, int position, int widthSpec,
-                                       int heightSpec, int[] measuredDimension) {
-            View view = recycler.getViewForPosition(position);
-            if (view != null) {
-                RecyclerView.LayoutParams p = (RecyclerView.LayoutParams) view.getLayoutParams();
-                int childWidthSpec = ViewGroup.getChildMeasureSpec(widthSpec,
-                        getPaddingLeft() + getPaddingRight(), p.width);
-                int childHeightSpec = ViewGroup.getChildMeasureSpec(heightSpec,
-                        getPaddingTop() + getPaddingBottom(), p.height);
-                view.measure(childWidthSpec, childHeightSpec);
-                measuredDimension[0] = view.getMeasuredWidth() + p.leftMargin + p.rightMargin;
-                measuredDimension[1] = view.getMeasuredHeight() + p.bottomMargin + p.topMargin;
-                recycler.recycleView(view);
-            }
-        }
     }
 }
