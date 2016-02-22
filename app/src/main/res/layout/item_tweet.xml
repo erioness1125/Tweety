@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    android:paddingLeft="@dimen/custom_margin"
+    android:paddingTop="@dimen/custom_margin"
+    android:paddingRight="@dimen/custom_margin"
+    android:paddingBottom="@dimen/custom_margin">
 
     <ImageView
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:id="@+id/ivProfileImg"
-        android:src="@drawable/ic_person_24dp"
+        android:src="@drawable/twitter_blue"
         android:layout_gravity="center_horizontal|top"
         android:layout_marginRight="@dimen/custom_margin"
         android:layout_marginBottom="@dimen/custom_margin" />

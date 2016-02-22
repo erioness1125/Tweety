@@ -2,7 +2,7 @@ package com.codepath.apps.mytinytwitter.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -19,11 +19,12 @@ import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.TwitterApplication;
 import com.codepath.apps.mytinytwitter.TwitterClient;
 import com.codepath.apps.mytinytwitter.adapters.TimelineAdapter;
+import com.codepath.apps.mytinytwitter.fragments.ComposeDialogFragment;
 import com.codepath.apps.mytinytwitter.listeners.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.mytinytwitter.models.Tweet;
-import com.google.gson.FieldNamingPolicy;
+import com.codepath.apps.mytinytwitter.utils.DividerItemDecoration;
+import com.codepath.apps.mytinytwitter.utils.MyGson;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -61,8 +62,7 @@ public class TimelineActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showComposeDialog();
             }
         });
 
@@ -103,6 +103,9 @@ public class TimelineActivity extends AppCompatActivity {
                 populateTimeline(tweetsCount, nextMaxId);
             }
         });
+        RecyclerView.ItemDecoration itemDecoration =
+                new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+        rvTweets.addItemDecoration(itemDecoration);
         /********************** end of RecyclerView **********************/
 
         twitterClient = TwitterApplication.getRestClient(); // singleton client
@@ -139,18 +142,20 @@ public class TimelineActivity extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 String responseString = response.toString();
-                Type collectionType = new TypeToken<List<Tweet>>() {
-                }.getType();
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                // mapping camel case field names
-                gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-                Gson gson = gsonBuilder.create();
+                Type collectionType = new TypeToken<List<Tweet>>(){ }.getType();
+                Gson gson = MyGson.getMyGson();
                 tweetList = gson.fromJson(responseString, collectionType);
 
                 adapter.addAll(tweetList);
                 adapter.notifyDataSetChanged();
             }
         });
+    }
+
+    private void showComposeDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        ComposeDialogFragment editNameDialog = ComposeDialogFragment.newInstance("Some Title");
+        editNameDialog.show(fm, "fragment_compose");
     }
 
     @Override

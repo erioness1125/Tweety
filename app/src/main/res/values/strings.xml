@@ -9,5 +9,9 @@
     <string name="name">Name</string>
     <string name="screen_name">Screen Name</string>
     <string name="created_at">Created at</string>
+    <string name="hint_whats_happening">What\'s happening?</string>
+    <string name="tweet">Tweet</string>
+    <string name="cancel">Cancel</string>
+    <string name="_140">140</string>
 
 </resources>
