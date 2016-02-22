@@ -69,12 +69,6 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        //this change height of RecyclerView
-//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-//                ViewGroup.LayoutParams.WRAP_CONTENT, containerHeight((TimelineActivity) context));
-//        holder.itemView.setLayoutParams(params);
-//        holder.itemView.setMinimumHeight(200);
-
         // Get the data model based on position
         Tweet tweet = tweetList.get(position);
 
@@ -166,9 +160,19 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
         @Bind(R.id.tvCreatedAt) TextView tvCreatedAt;
         @Bind(R.id.tvText) TextView tvText;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            // Setup the click listener
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Triggers click upwards to the adapter on click
+                    if (listener != null)
+                        listener.onItemClick(itemView, getLayoutPosition());
+                }
+            });
         }
     }
 }

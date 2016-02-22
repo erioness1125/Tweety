@@ -23,7 +23,6 @@ import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.TwitterApplication;
 import com.codepath.apps.mytinytwitter.TwitterClient;
 import com.codepath.apps.mytinytwitter.models.Tweet;
-import com.codepath.apps.mytinytwitter.models.User;
 import com.codepath.apps.mytinytwitter.utils.MyGson;
 import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -61,12 +60,12 @@ public class ComposeDialogFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static ComposeDialogFragment newInstance(String title) {
+    public static ComposeDialogFragment newInstance(String profileImgUrl) {
         ComposeDialogFragment fragment = new ComposeDialogFragment();
         fragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-//        Bundle args = new Bundle();
-//        args.putString("title", title);
-//        fragment.setArguments(args);
+        Bundle args = new Bundle();
+        args.putString("profileImgUrl", profileImgUrl);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -85,48 +84,28 @@ public class ComposeDialogFragment extends DialogFragment {
         context = getContext();
         twitterClient = TwitterApplication.getRestClient();
 
+        String profileImgUrl = getArguments().getString("profileImgUrl");
+        Glide.with(context)
+                .load(profileImgUrl)
+                .asBitmap()
+                .fitCenter()
+                .into(new BitmapImageViewTarget(ivMyProfileImg) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                        circularBitmapDrawable.setCornerRadius(5.0f);
+                        ivMyProfileImg.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
+
         // by default, the btnTweet is disabled
         toggleButton(false);
-
-        // set user profile picture
-        setUserProfilePicture();
 
         // Show soft keyboard automatically and request focus to field
         etNewTweet.requestFocus();
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-    }
-
-    // to get the user profile picture
-    private void setUserProfilePicture() {
-        twitterClient.getUserAccount(new JsonHttpResponseHandler() {
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                String responseString = response.toString();
-                Gson gson = MyGson.getMyGson();
-                User user = gson.fromJson(responseString, User.class);
-                String profileImgUrl = user.getProfileImageUrl();
-                Glide.with(context)
-                        .load(profileImgUrl)
-                        .asBitmap()
-                        .fitCenter()
-                        .into(new BitmapImageViewTarget(ivMyProfileImg) {
-                            @Override
-                            protected void setResource(Bitmap resource) {
-                                RoundedBitmapDrawable circularBitmapDrawable =
-                                        RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                                circularBitmapDrawable.setCornerRadius(5.0f);
-                                ivMyProfileImg.setImageDrawable(circularBitmapDrawable);
-                            }
-                        });
-            }
-        });
     }
 
     @OnClick(R.id.btnTweet)

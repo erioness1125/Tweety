@@ -1,5 +1,6 @@
 package com.codepath.apps.mytinytwitter.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +24,7 @@ import com.codepath.apps.mytinytwitter.adapters.TimelineAdapter;
 import com.codepath.apps.mytinytwitter.fragments.ComposeDialogFragment;
 import com.codepath.apps.mytinytwitter.listeners.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.mytinytwitter.models.Tweet;
+import com.codepath.apps.mytinytwitter.models.User;
 import com.codepath.apps.mytinytwitter.utils.DividerItemDecoration;
 import com.codepath.apps.mytinytwitter.utils.MyGson;
 import com.google.gson.Gson;
@@ -32,6 +34,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -52,6 +55,8 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
     private int tweetsCount = 20;
     private String nextMaxId;
 
+    private final User[] me = new User[1];
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +73,11 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         });
 
         ButterKnife.bind(this);
+
+        twitterClient = TwitterApplication.getRestClient(); // singleton client
+
+        // get my user info
+        getMyUserInfo();
 
         /********************** SwipeRefreshLayout **********************/
         // Setup refresh listener which triggers new data loading
@@ -112,18 +122,18 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         adapter.setOnItemClickListener(new TimelineAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-//                // create an intent to display the article
-//                Intent i = new Intent(getApplicationContext(), ArticleActivity.class);
-//                // get the article to display
-//                Article article = articles.get(position);
-//                // pass in that article into intent
-//                i.putExtra(getString(R.string.url), article.getWebUrl());
-//                // launch the activity
-//                startActivity(i);
+                // create an intent to display the article
+                Intent i = new Intent(getApplicationContext(), TweetActivity.class);
+                // get the article to display
+                Tweet tweet = tweetList.get(position);
+                // pass objects to the target activity
+                i.putExtra("tweet", Parcels.wrap(tweet));
+                i.putExtra("me", Parcels.wrap(me[0]));
+                // launch the activity
+                startActivity(i);
             }
         });
 
-        twitterClient = TwitterApplication.getRestClient(); // singleton client
         // first request
         // from dev.twitter.com:
         // To use max_id correctly, an application’s first request to a timeline endpoint should only specify a count.
@@ -161,9 +171,10 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
                 Type collectionType = new TypeToken<List<Tweet>>() {
                 }.getType();
                 Gson gson = MyGson.getMyGson();
-                tweetList = gson.fromJson(responseString, collectionType);
+                List<Tweet> loadedTweetList = gson.fromJson(responseString, collectionType);
+                tweetList.addAll(loadedTweetList);
 
-                adapter.addAll(tweetList);
+                adapter.setTweetList(tweetList);
                 adapter.notifyDataSetChanged();
             }
         });
@@ -171,8 +182,27 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
     private void showComposeDialog() {
         FragmentManager fm = getSupportFragmentManager();
-        ComposeDialogFragment editNameDialog = ComposeDialogFragment.newInstance("Some Title");
+        ComposeDialogFragment editNameDialog = ComposeDialogFragment.newInstance(me[0].getProfileImageUrl());
         editNameDialog.show(fm, "fragment_compose");
+    }
+
+    private void getMyUserInfo() {
+        twitterClient.getUserAccount(new JsonHttpResponseHandler() {
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+//                super.onFailure(statusCode, headers, throwable, errorResponse);
+                Toast.makeText(getApplicationContext(), "Failed to load my info", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                String responseString = response.toString();
+                Gson gson = MyGson.getMyGson();
+                me[0] = gson.fromJson(responseString, User.class);
+            }
+        });
     }
 
     @Override
