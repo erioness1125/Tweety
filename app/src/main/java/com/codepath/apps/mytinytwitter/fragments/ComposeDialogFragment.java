@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
@@ -50,6 +49,11 @@ public class ComposeDialogFragment extends DialogFragment {
 
     private Context context;
     private TwitterClient twitterClient;
+
+    // 1. Defines the listener interface with a method passing back data result.
+    public interface ComposeDialogListener {
+        void onFinishComposeDialog(Tweet tweet);
+    }
 
     public ComposeDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -139,7 +143,11 @@ public class ComposeDialogFragment extends DialogFragment {
                 String responseString = response.toString();
                 Gson gson = MyGson.getMyGson();
                 Tweet newTweet = gson.fromJson(responseString, Tweet.class);
-                Toast.makeText(context, newTweet.getIdStr(), Toast.LENGTH_SHORT).show();
+
+                // Return newTweet back to activity through the implemented listener
+                ComposeDialogListener listener = (ComposeDialogListener) getActivity();
+                listener.onFinishComposeDialog(newTweet);
+
                 dismiss();
             }
         });

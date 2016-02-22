@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -38,6 +37,18 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
 
     private Context context;
 
+    // Define listener member variable
+    private static OnItemClickListener listener;
+
+    // Define the listener interface
+    public interface OnItemClickListener {
+        void onItemClick(View itemView, int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     public TimelineAdapter(List<Tweet> tweetList) {
         this.tweetList = tweetList;
         currentTime = System.currentTimeMillis();
@@ -59,9 +70,10 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         //this change height of RecyclerView
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, containerHeight((TimelineActivity) context));
-        holder.itemView.setLayoutParams(params);
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                ViewGroup.LayoutParams.WRAP_CONTENT, containerHeight((TimelineActivity) context));
+//        holder.itemView.setLayoutParams(params);
+//        holder.itemView.setMinimumHeight(200);
 
         // Get the data model based on position
         Tweet tweet = tweetList.get(position);
@@ -114,6 +126,10 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
     public void addAll(List<Tweet> tweetList) {
         this.tweetList.addAll(tweetList);
         notifyDataSetChanged();
+    }
+
+    public void setTweetList(List<Tweet> tweetList) {
+        this.tweetList = tweetList;
     }
 
     // getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");

@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.TwitterApplication;
@@ -39,7 +40,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.ComposeDialogListener {
 
     @Bind(R.id.rvTweets) RecyclerView rvTweets;
     @Bind(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
@@ -108,6 +109,20 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.addItemDecoration(itemDecoration);
         /********************** end of RecyclerView **********************/
 
+        adapter.setOnItemClickListener(new TimelineAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+//                // create an intent to display the article
+//                Intent i = new Intent(getApplicationContext(), ArticleActivity.class);
+//                // get the article to display
+//                Article article = articles.get(position);
+//                // pass in that article into intent
+//                i.putExtra(getString(R.string.url), article.getWebUrl());
+//                // launch the activity
+//                startActivity(i);
+            }
+        });
+
         twitterClient = TwitterApplication.getRestClient(); // singleton client
         // first request
         // from dev.twitter.com:
@@ -136,13 +151,15 @@ public class TimelineActivity extends AppCompatActivity {
         twitterClient.getHomeTimeline(count, maxId, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
+//                super.onFailure(statusCode, headers, throwable, errorResponse);
+                Toast.makeText(getApplicationContext(), "Cannot retrieve more tweets... Try again", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 String responseString = response.toString();
-                Type collectionType = new TypeToken<List<Tweet>>(){ }.getType();
+                Type collectionType = new TypeToken<List<Tweet>>() {
+                }.getType();
                 Gson gson = MyGson.getMyGson();
                 tweetList = gson.fromJson(responseString, collectionType);
 
@@ -183,5 +200,13 @@ public class TimelineActivity extends AppCompatActivity {
         });
 
         return true;
+    }
+
+    @Override
+    public void onFinishComposeDialog(Tweet tweet) {
+        tweetList.add(0, tweet);
+        adapter.setTweetList(tweetList);
+        adapter.notifyDataSetChanged();
+        rvTweets.getLayoutManager().scrollToPosition(0);
     }
 }
