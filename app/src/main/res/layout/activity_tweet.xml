@@ -123,7 +123,9 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/rlIcons"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            android:id="@+id/rlReply"
+            android:visibility="invisible">
 
             <ImageView
                 android:layout_width="48dp"
@@ -135,14 +137,25 @@
                 android:src="@drawable/twitter_blue" />
 
             <EditText
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/etTweetReply"
                 android:layout_toRightOf="@+id/ivTweetMyProfileImg"
-                android:layout_toEndOf="@+id/ivTweetMyProfileImg"
                 android:layout_alignParentBottom="true"
                 android:hint="Reply to..."
-                android:layout_alignTop="@+id/ivTweetMyProfileImg" />
+                android:layout_alignTop="@+id/ivTweetMyProfileImg"
+                android:layout_toLeftOf="@+id/btnReply"
+                android:layout_toStartOf="@+id/btnReply" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reply"
+                android:id="@+id/btnReply"
+                android:layout_alignBottom="@+id/etTweetReply"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/layout_rounded_corners" />
         </RelativeLayout>
     </RelativeLayout>
 </LinearLayout>

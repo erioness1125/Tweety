@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">My Tiny Twitter</string>
-    <string name="login_label">Log in</string>
+    <string name="login_label">Go Tweet!</string>
     <string name="title_activity_timeline">Home Timeline</string>
 
     <string name="search">Search</string>
@@ -13,5 +13,6 @@
     <string name="tweet">Tweet</string>
     <string name="cancel">Cancel</string>
     <string name="_140">140</string>
+    <string name="reply">Reply</string>
 
 </resources>
