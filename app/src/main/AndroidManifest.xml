@@ -48,7 +48,9 @@
             android:name=".activities.TimelineActivity"
             android:label="@string/title_activity_timeline"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.TweetActivity"></activity>
+        <activity android:name=".activities.TweetActivity" />
+        <activity android:name=".activities.ProfileActivity"
+            android:label="Profile"></activity>
     </application>
 
 </manifest>

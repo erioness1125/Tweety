@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/background_light"
     android:paddingLeft="@dimen/custom_margin"
     android:paddingTop="@dimen/custom_margin"
     android:paddingRight="@dimen/custom_margin"
@@ -12,7 +11,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:id="@+id/ivProfileImg"
-        android:src="@drawable/twitter_blue"
+        android:src="@drawable/ic_twitter_55acee"
         android:layout_gravity="center_horizontal|top"
         android:layout_marginRight="@dimen/custom_margin"
         android:layout_marginBottom="@dimen/custom_margin" />

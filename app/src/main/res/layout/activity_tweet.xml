@@ -19,7 +19,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:src="@drawable/twitter_blue" />
+            android:src="@drawable/ic_twitter_55acee" />
 
         <LinearLayout
             android:orientation="vertical"
@@ -134,7 +134,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:src="@drawable/twitter_blue" />
+                android:src="@drawable/ic_twitter_55acee" />
 
             <EditText
                 android:layout_width="wrap_content"

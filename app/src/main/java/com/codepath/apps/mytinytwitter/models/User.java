@@ -5,17 +5,32 @@ import org.parceler.Parcel;
 @Parcel
 public class User {
 
-    String idStr, name, profileImageUrl, screenName;
+    int followersCount, friendsCount;
+    String description, idStr, name, profileImageUrl, screenName;
 
     public User() {
 
     }
 
-    public User(String idStr, String name, String profileImageUrl, String screenName) {
+    public User(int followersCount, int friendsCount,
+                String description, String idStr, String name, String profileImageUrl, String screenName) {
+        this.description = description;
         this.idStr = idStr;
         this.name = name;
         this.profileImageUrl = profileImageUrl;
         this.screenName = screenName;
+    }
+
+    public int getFollowersCount() {
+        return followersCount;
+    }
+
+    public int getFriendsCount() {
+        return friendsCount;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getIdStr() {
