@@ -46,13 +46,13 @@ public class UserTimelineFragment extends TweetsListFragment {
 
         /********************** RecyclerView **********************/
         // Set layout manager to position the items
-        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvTweets.setLayoutManager(linearLayoutManager);
         // Add the scroll listener
         rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                Tweet lastTweet = tweetList.get(tweetList.size() - 1);
+                Tweet lastTweet = mTweetList.get(mTweetList.size() - 1);
                 nextMaxId = lastTweet.getIdStr();
                 populateTimeline(tweetsCount);
             }
@@ -86,11 +86,11 @@ public class UserTimelineFragment extends TweetsListFragment {
     // 1. send an API request to get the timeline json
     // 2. fill the RecyclerView by creating the tweet objects from the json
     private void populateTimeline(int count) {
-        String userId = getArguments().getString(context.getString(R.string.userid));
+        String userId = getArguments().getString(getContext().getString(R.string.userid));
         twitterClient.getUserTimeline(count, userId, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Toast.makeText(context, "Cannot retrieve more tweets... Try again", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Cannot retrieve more tweets... Try again", Toast.LENGTH_LONG).show();
             }
 
             @Override

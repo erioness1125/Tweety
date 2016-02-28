@@ -6,17 +6,16 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.codepath.apps.mytinytwitter.R;
-import com.codepath.apps.mytinytwitter.activities.TimelineActivity;
 import com.codepath.apps.mytinytwitter.models.Tweet;
 
 import java.text.ParseException;
@@ -42,7 +41,8 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
 
     // Define the listener interface
     public interface OnItemClickListener {
-        void onItemClick(View itemView, int position);
+        void onProfilePicClick(View itemView, int position);
+        void onTweetContainerClick(View itemView, int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -144,16 +144,11 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
         return relativeDate;
     }
 
-    public static int containerHeight(TimelineActivity timelineActivity) {
-        DisplayMetrics dm = new DisplayMetrics();
-        timelineActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        return (int) (dm.heightPixels / 5.0);
-    }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.ivProfileImg) ImageView ivProfileImg;
+
+        @Bind(R.id.llTweetContainer) LinearLayout llTweetContainer;
 
         @Bind(R.id.tvName) TextView tvName;
         @Bind(R.id.tvScreenName) TextView tvScreenName;
@@ -164,13 +159,23 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            // Setup the click listener
-            itemView.setOnClickListener(new View.OnClickListener() {
+            // ivProfileImg onClickListener
+            ivProfileImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Triggers click upwards to the adapter on click
                     if (listener != null)
-                        listener.onItemClick(itemView, getLayoutPosition());
+                        listener.onProfilePicClick(itemView, getLayoutPosition());
+                }
+            });
+
+            // Setup the click listener
+            llTweetContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Triggers click upwards to the adapter on click
+                    if (listener != null)
+                        listener.onTweetContainerClick(itemView, getLayoutPosition());
                 }
             });
         }

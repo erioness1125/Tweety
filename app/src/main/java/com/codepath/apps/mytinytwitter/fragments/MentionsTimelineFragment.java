@@ -45,13 +45,13 @@ public class MentionsTimelineFragment extends TweetsListFragment {
 
         /********************** RecyclerView **********************/
         // Set layout manager to position the items
-        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvTweets.setLayoutManager(linearLayoutManager);
         // Add the scroll listener
         rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                Tweet lastTweet = tweetList.get(tweetList.size() - 1);
+                Tweet lastTweet = mTweetList.get(mTweetList.size() - 1);
                 nextMaxId = lastTweet.getIdStr();
                 populateTimeline(tweetsCount, nextMaxId);
             }
@@ -86,7 +86,7 @@ public class MentionsTimelineFragment extends TweetsListFragment {
         twitterClient.getMentionsTimeline(count, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Toast.makeText(context, "Cannot retrieve more tweets... Try again", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Cannot retrieve more tweets... Try again", Toast.LENGTH_LONG).show();
             }
 
             @Override

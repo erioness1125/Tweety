@@ -1,8 +1,9 @@
 package com.codepath.apps.mytinytwitter.fragments;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,8 @@ import android.widget.Toast;
 import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.TwitterApplication;
 import com.codepath.apps.mytinytwitter.TwitterClient;
+import com.codepath.apps.mytinytwitter.activities.ProfileActivity;
+import com.codepath.apps.mytinytwitter.activities.TweetActivity;
 import com.codepath.apps.mytinytwitter.adapters.TimelineAdapter;
 import com.codepath.apps.mytinytwitter.models.Tweet;
 import com.codepath.apps.mytinytwitter.models.User;
@@ -24,6 +27,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +40,7 @@ public class TweetsListFragment extends Fragment {
     @Bind(R.id.rvTweets) RecyclerView rvTweets;
     @Bind(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
 
-    protected Context context;
-    protected List<Tweet> tweetList;
+    protected List<Tweet> mTweetList;
     protected TimelineAdapter adapter;
     protected TwitterClient twitterClient;
 
@@ -51,15 +54,39 @@ public class TweetsListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tweets_list, container, false);
         ButterKnife.bind(this, view);
-        context = getContext();
 
         /********************** RecyclerView **********************/
-        tweetList = new ArrayList<>();
-        adapter = new TimelineAdapter(tweetList);
+        mTweetList = new ArrayList<>();
+        adapter = new TimelineAdapter(mTweetList);
+        adapter.setOnItemClickListener(new TimelineAdapter.OnItemClickListener() {
+            @Override
+            public void onProfilePicClick(View itemView, int position) {
+                Intent i = new Intent(getContext(), ProfileActivity.class);
+                // get the article to display
+                Tweet tweet = mTweetList.get(position);
+                // pass objects to the target activity
+                i.putExtra(getString(R.string.userid), tweet.getIdStr());
+                // launch the activity
+                startActivity(i);
+            }
+
+            @Override
+            public void onTweetContainerClick(View itemView, int position) {
+                // create an intent to display the article
+                Intent i = new Intent(getContext(), TweetActivity.class);
+                // get the article to display
+                Tweet tweet = mTweetList.get(position);
+                // pass objects to the target activity
+                i.putExtra("tweet", Parcels.wrap(tweet));
+                i.putExtra("me", Parcels.wrap(me[0]));
+                // launch the activity
+                startActivity(i);
+            }
+        });
         // Attach the adapter to the RecyclerView to populate items
         rvTweets.setAdapter(adapter);
         RecyclerView.ItemDecoration itemDecoration =
-                new DividerItemDecoration(context, DividerItemDecoration.VERTICAL_LIST);
+                new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST);
         rvTweets.addItemDecoration(itemDecoration);
         /********************** end of RecyclerView **********************/
 
@@ -78,8 +105,6 @@ public class TweetsListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tweetList = new ArrayList<>();
-        adapter = new TimelineAdapter(tweetList);
 
         twitterClient = TwitterApplication.getRestClient(); // singleton client
 
@@ -89,6 +114,7 @@ public class TweetsListFragment extends Fragment {
 
     protected void addAllToAdapter(List<Tweet> tweetList) {
         adapter.addAll(tweetList);
+        adapter.notifyItemRangeInserted(mTweetList.size()-1, tweetList.size());
     }
 
     protected void clearAdapter() {
@@ -99,7 +125,14 @@ public class TweetsListFragment extends Fragment {
         twitterClient.getUserAccount(new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Toast.makeText(context, "Failed to load my info", Toast.LENGTH_SHORT).show();
+                if (statusCode == 429) {
+                    // 429 Too Many Requests
+                    Snackbar.make(getView(),
+                            "Sent too many requests exceeding Twitter Rate limit! Try again later",
+                            Snackbar.LENGTH_LONG).show();
+                }
+                else
+                    Toast.makeText(getContext(), "Failed to load my info", Toast.LENGTH_SHORT).show();
             }
 
             @Override
