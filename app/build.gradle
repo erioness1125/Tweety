@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 23
@@ -22,8 +23,6 @@ repositories {
     jcenter()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
-
-apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.codepath.apps.mytinytwitter.R;
+import com.codepath.apps.mytinytwitter.models.Medium;
 import com.codepath.apps.mytinytwitter.models.Tweet;
 
 import java.text.ParseException;
@@ -26,18 +27,16 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHolder> {
+public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Tweet> tweetList;
-
-    private static long currentTime;
-
-    private static final String UNKNOWN = "UNKNOWN";
+    private final int TEXT = 1;
+    private final int TEXT_IMAGE = 2;
 
     private Context context;
+    private List<Tweet> tweetList;
 
     // Define listener member variable
-    private static OnItemClickListener listener;
+    private OnItemClickListener listener;
 
     // Define the listener interface
     public interface OnItemClickListener {
@@ -51,63 +50,73 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
 
     public TimelineAdapter(List<Tweet> tweetList) {
         this.tweetList = tweetList;
-        currentTime = System.currentTimeMillis();
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        // Inflate the custom layout
-        View contactView = inflater.inflate(R.layout.item_tweet, parent, false);
+        RecyclerView.ViewHolder viewHolder = null;
+        View view = null;
 
-        // Return a new holder instance
-        ViewHolder viewHolder = new ViewHolder(contactView);
+        switch (viewType) {
+            case TEXT:
+                // Inflate the custom layout
+                view = inflater.inflate(R.layout.item_tweet, parent, false);
+
+                // Return a new holder instance
+                viewHolder = new TextViewHolder(view);
+                break;
+            case TEXT_IMAGE:
+                // Inflate the custom layout
+                view = inflater.inflate(R.layout.item_tweet_photo, parent, false);
+
+                // Return a new holder instance
+                viewHolder = new PhotoViewHolder(view);
+                break;
+            default:
+                // Inflate the custom layout
+                view = inflater.inflate(R.layout.item_tweet, parent, false);
+
+                // Return a new holder instance
+                viewHolder = new TextViewHolder(view);
+                break;
+        }
+
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         // Get the data model based on position
         Tweet tweet = tweetList.get(position);
 
-        // Set item views based on the data model
-        final ImageView ivProfileImg = holder.ivProfileImg;
-        Glide.with(context)
-                .load(tweet.getUser().getProfileImageUrl())
-                .asBitmap()
-                .fitCenter()
-                .into(new BitmapImageViewTarget(ivProfileImg) {
-                    @Override
-                    protected void setResource(Bitmap resource) {
-                        RoundedBitmapDrawable circularBitmapDrawable =
-                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
-                        circularBitmapDrawable.setCornerRadius(5.0f);
-                        ivProfileImg.setImageDrawable(circularBitmapDrawable);
-                    }
-                });
-
-        // name of the user
-        TextView tvName = holder.tvName;
-        tvName.setText(tweet.getUser().getName());
-
-        // screen name, handle, or alias that this user identifies themselves with
-        TextView tvScreenName = holder.tvScreenName;
-        tvScreenName.setText("@" + tweet.getUser().getScreenName());
-
-        // UTC time when this Tweet was created
-        TextView tvCreatedAt = holder.tvCreatedAt;
-        tvCreatedAt.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
-
-        // actual UTF-8 text of the status update
-        TextView tvText = holder.tvText;
-        tvText.setText(tweet.getText());
+        switch (holder.getItemViewType()) {
+            case TEXT:
+                populateTextTweet((TextViewHolder) holder, tweet);
+                break;
+            case TEXT_IMAGE:
+                populatePhotoTweet((PhotoViewHolder) holder, tweet);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public int getItemCount() {
         return tweetList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Tweet tweet = tweetList.get(position);
+        List<Medium> mediaList = tweet.getEntities().getMedia();
+        if (mediaList == null || mediaList.isEmpty())
+            return TEXT; // -> ViewHolder
+        else
+            return TEXT_IMAGE; // -> PhotoViewHolder
     }
 
     // Clean all elements of the recycler
@@ -144,23 +153,125 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
         return relativeDate;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    private void populateTextTweet(TextViewHolder holder, Tweet tweet) {
+        // Set item views based on the data model
+        final ImageView ivProfileImg = holder.ivTProfileImg;
+        Glide.with(context)
+                .load(tweet.getUser().getProfileImageUrl())
+                .asBitmap()
+                .fitCenter()
+                .into(new BitmapImageViewTarget(ivProfileImg) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                        circularBitmapDrawable.setCornerRadius(5.0f);
+                        ivProfileImg.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
 
-        @Bind(R.id.ivProfileImg) ImageView ivProfileImg;
+        // name of the user
+        holder.tvTName.setText(tweet.getUser().getName());
 
-        @Bind(R.id.llTweetContainer) LinearLayout llTweetContainer;
+        // screen name, handle, or alias that this user identifies themselves with
+        holder.tvTScreenName.setText("@" + tweet.getUser().getScreenName());
 
-        @Bind(R.id.tvName) TextView tvName;
-        @Bind(R.id.tvScreenName) TextView tvScreenName;
-        @Bind(R.id.tvCreatedAt) TextView tvCreatedAt;
-        @Bind(R.id.tvText) TextView tvText;
+        // UTC time when this Tweet was created
+        holder.tvTCreatedAt.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
 
-        public ViewHolder(final View itemView) {
+        // actual UTF-8 text of the status update
+        holder.tvTText.setText(tweet.getText());
+
+        // retweet and likes count
+        holder.tvTRTCnt.setText(String.valueOf(tweet.getRetweetCount()));
+        holder.tvTLikesCnt.setText(String.valueOf(tweet.getFavoriteCount()));
+    }
+
+    private void populatePhotoTweet(PhotoViewHolder holder, Tweet tweet) {
+        // Set item views based on the data model
+        final ImageView ivTPProfileImg = holder.ivTPProfileImg;
+        Glide.with(context)
+                .load(tweet.getUser().getProfileImageUrl())
+                .asBitmap()
+                .fitCenter()
+                .into(new BitmapImageViewTarget(ivTPProfileImg) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                        circularBitmapDrawable.setCornerRadius(5.0f);
+                        ivTPProfileImg.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
+
+        // name of the user
+        holder.tvTPName.setText(tweet.getUser().getName());
+
+        // screen name, handle, or alias that this user identifies themselves with
+        holder.tvTPScreenName.setText("@" + tweet.getUser().getScreenName());
+
+        // UTC time when this Tweet was created
+        holder.tvTPCreatedAt.setText(getRelativeTimeAgo(tweet.getCreatedAt()));
+
+        // actual UTF-8 text of the status update
+        holder.tvTPText.setText(tweet.getText());
+
+        // set photo
+        final ImageView ivTPPhoto = holder.ivTPPhoto;
+        List<Medium> mediaList = tweet.getEntities().getMedia();
+        String photoUrl = "";
+        for (Medium medium : mediaList) {
+            if ("photo".equals(medium.getType())) {
+                photoUrl = medium.getMediaUrl();
+                break;
+            }
+        }
+        Glide.with(context)
+                .load(photoUrl)
+                .asBitmap()
+                .fitCenter()
+                .into(new BitmapImageViewTarget(ivTPPhoto) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(context.getResources(), resource);
+                        circularBitmapDrawable.setCornerRadius(5.0f);
+                        ivTPPhoto.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
+
+        // retweet and likes count
+        holder.tvTPRTCnt.setText(String.valueOf(tweet.getRetweetCount()));
+        holder.tvTPLikesCnt.setText(String.valueOf(tweet.getFavoriteCount()));
+    }
+
+    // tweet text only
+    public class TextViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.ivTProfileImg) ImageView ivTProfileImg;
+
+        @Bind(R.id.llTContainer) LinearLayout llTContainer;
+
+        @Bind(R.id.tvTName) TextView tvTName;
+        @Bind(R.id.tvTScreenName) TextView tvTScreenName;
+        @Bind(R.id.tvTCreatedAt) TextView tvTCreatedAt;
+        @Bind(R.id.tvTText) TextView tvTText;
+
+        /************************** elements in rlTIcons ************************/
+        @Bind(R.id.ivTReply) ImageView ivTReply;
+        @Bind(R.id.ivTReTweet) ImageView ivTReTweet;
+        @Bind(R.id.ivTLike) ImageView ivTLike;
+
+        @Bind(R.id.tvTRTCnt) TextView tvTRTCnt;
+        @Bind(R.id.tvTLikesCnt) TextView tvTLikesCnt;
+        /************************** end of rlTIcons ************************/
+
+        public TextViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
             // ivProfileImg onClickListener
-            ivProfileImg.setOnClickListener(new View.OnClickListener() {
+            ivTProfileImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Triggers click upwards to the adapter on click
@@ -170,7 +281,56 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ViewHo
             });
 
             // Setup the click listener
-            llTweetContainer.setOnClickListener(new View.OnClickListener() {
+            llTContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Triggers click upwards to the adapter on click
+                    if (listener != null)
+                        listener.onTweetContainerClick(itemView, getLayoutPosition());
+                }
+            });
+        }
+    }
+
+    // tweet with photo
+    public class PhotoViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.ivTPProfileImg) ImageView ivTPProfileImg;
+
+        @Bind(R.id.llTPContainer) LinearLayout llTPContainer;
+
+        @Bind(R.id.tvTPName) TextView tvTPName;
+        @Bind(R.id.tvTPScreenName) TextView tvTPScreenName;
+        @Bind(R.id.tvTPCreatedAt) TextView tvTPCreatedAt;
+        @Bind(R.id.tvTPText) TextView tvTPText;
+
+        @Bind(R.id.ivTPPhoto) ImageView ivTPPhoto;
+
+        /************************** elements in rlTPIcons ************************/
+        @Bind(R.id.ivTPReply) ImageView ivTPReply;
+        @Bind(R.id.ivTPReTweet) ImageView ivTPReTweet;
+        @Bind(R.id.ivTPLike) ImageView ivTPLike;
+
+        @Bind(R.id.tvTPRTCnt) TextView tvTPRTCnt;
+        @Bind(R.id.tvTPLikesCnt) TextView tvTPLikesCnt;
+        /************************** end of rlTPIcons ************************/
+
+        public PhotoViewHolder(final View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+            // ivProfileImg onClickListener
+            ivTPProfileImg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Triggers click upwards to the adapter on click
+                    if (listener != null)
+                        listener.onProfilePicClick(itemView, getLayoutPosition());
+                }
+            });
+
+            // Setup the click listener
+            llTPContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Triggers click upwards to the adapter on click

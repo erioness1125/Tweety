@@ -2,12 +2,12 @@ package com.codepath.apps.mytinytwitter.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.listeners.EndlessRecyclerViewScrollListener;
@@ -87,21 +87,40 @@ public class UserTimelineFragment extends TweetsListFragment {
     // 2. fill the RecyclerView by creating the tweet objects from the json
     private void populateTimeline(int count) {
         String userId = getArguments().getString(getContext().getString(R.string.userid));
-        twitterClient.getUserTimeline(count, userId, new JsonHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Toast.makeText(getContext(), "Cannot retrieve more tweets... Try again", Toast.LENGTH_LONG).show();
-            }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                String responseString = response.toString();
-                Type collectionType = new TypeToken<List<Tweet>>() {
-                }.getType();
-                Gson gson = MyGson.getMyGson();
-                List<Tweet> loadedTweetList = gson.fromJson(responseString, collectionType);
-                addAllToAdapter(loadedTweetList);
-            }
-        });
+        if (!isNetworkAvailable() || !isOnline()) {
+            swipeContainer.setVisibility(View.INVISIBLE);
+            llError.setVisibility(View.VISIBLE);
+        }
+        else {
+            llError.setVisibility(View.INVISIBLE);
+            swipeContainer.setVisibility(View.VISIBLE);
+
+            twitterClient.getUserTimeline(count, userId, new JsonHttpResponseHandler() {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    if (statusCode == 429) {
+                        // 429 Too Many Requests
+                        Snackbar.make(view,
+                                "Sent too many requests exceeding Twitter Rate limit! Try again later",
+                                Snackbar.LENGTH_LONG).show();
+                    } else {
+                        Snackbar.make(view,
+                                "Problem with loading timeline... Try again later",
+                                Snackbar.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                    String responseString = response.toString();
+                    Type collectionType = new TypeToken<List<Tweet>>() {
+                    }.getType();
+                    Gson gson = MyGson.getMyGson();
+                    List<Tweet> loadedTweetList = gson.fromJson(responseString, collectionType);
+                    addAllToAdapter(loadedTweetList);
+                }
+            });
+        }
     }
 }

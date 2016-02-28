@@ -18,5 +18,11 @@
     <string name="userid">userId</string>
     <string name="following">Following</string>
     <string name="followers">Followers</string>
+    <string name="error_loading">Tweets aren\'t loading right now</string>
+    <string name="error_retry">Please tab to retry</string>
+    <string name="at">\@</string>
+    <string name="retweets">RETWEETS</string>
+    <string name="likes">LIKES</string>
+    <string name="_0">0</string>
 
 </resources>

@@ -11,7 +11,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/flContainerProfHd"></FrameLayout>
+        android:id="@+id/flContainerProfHd"
+        android:background="@android:color/background_light"></FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -19,6 +20,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/flContainer"
-        android:layout_below="@+id/flContainerProfHd"></FrameLayout>
+        android:layout_below="@+id/flContainerProfHd"
+        android:background="@android:color/background_light"></FrameLayout>
 
 </RelativeLayout>

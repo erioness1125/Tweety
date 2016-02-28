@@ -1,78 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/custom_padding"
     android:paddingLeft="@dimen/custom_padding"
-    android:paddingTop="@dimen/custom_padding"
     android:paddingRight="@dimen/custom_padding"
-    android:paddingBottom="@dimen/custom_padding">
+    android:paddingTop="@dimen/custom_padding">
 
     <ImageView
+        android:id="@+id/ivTPProfileImg"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:id="@+id/ivTProfileImg"
-        android:src="@drawable/ic_twitter_55acee"
         android:layout_gravity="center_horizontal|top"
+        android:layout_marginBottom="@dimen/custom_margin"
         android:layout_marginRight="@dimen/custom_margin"
-        android:layout_marginBottom="@dimen/custom_margin" />
+        android:src="@drawable/ic_twitter_55acee" />
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/llTPContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:id="@+id/llTContainer">
+        android:orientation="vertical"
+        android:weightSum="1">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/llTWhoandWhen">
+            android:orientation="horizontal"
+            android:id="@+id/llTPWhoAndWhen">
 
             <TextView
+                android:id="@+id/tvTPName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/name"
-                android:id="@+id/tvTName"
-                android:textStyle="bold"
-                android:textColor="@color/twitter_black" />
+                android:textColor="@color/twitter_black"
+                android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvTPScreenName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/screen_name"
-                android:id="@+id/tvTScreenName"
                 android:layout_marginLeft="5dp"
+                android:text="@string/screen_name"
                 android:textColor="@color/twitter_darkgray"
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/tvTPCreatedAt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/created_at"
-                android:id="@+id/tvTCreatedAt"
                 android:gravity="right"
+                android:text="@string/created_at"
                 android:textColor="@color/twitter_darkgray"
                 android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tvTPText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvTText"
-            android:linksClickable="true"
             android:autoLink="all"
+            android:linksClickable="true"
             android:textColor="@color/twitter_black" />
 
-        <RelativeLayout
-            android:id="@+id/rlTIcons"
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ivTPPhoto"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/custom_margin" >
+            android:layout_marginTop="@dimen/custom_margin"
+            android:layout_marginBottom="@dimen/custom_margin" />
+
+        <RelativeLayout
+            android:id="@+id/rlTPIcons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/custom_margin">
 
             <ImageView
-                android:id="@+id/ivTReply"
+                android:id="@+id/ivTPReply"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -82,24 +93,35 @@
                 android:layout_marginRight="@dimen/custom_margin_icon" />
 
             <ImageView
-                android:id="@+id/ivTReTweet"
+                android:id="@+id/ivTPReTweet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/twitter_retweet"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/ivTReply"
-                android:layout_toEndOf="@+id/ivTReply"
+                android:layout_toRightOf="@+id/ivTPReply"
+                android:layout_toEndOf="@+id/ivTPReply"
                 android:layout_marginLeft="@dimen/custom_margin_icon"
                 android:layout_marginRight="@dimen/custom_margin" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/_0"
+                android:id="@+id/tvTPRTCnt"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/ivTPReTweet"
+                android:layout_toEndOf="@+id/ivTPReTweet"
+                android:layout_marginRight="@dimen/custom_margin_icon" />
+
             <ImageView
-                android:id="@+id/ivTLike"
+                android:id="@+id/ivTPLike"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/twitter_like"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/tvTRTCnt"
-                android:layout_toEndOf="@+id/tvTRTCnt"
+                android:layout_toRightOf="@+id/tvTPRTCnt"
+                android:layout_toEndOf="@+id/tvTPRTCnt"
                 android:layout_marginLeft="@dimen/custom_margin_icon"
                 android:layout_marginRight="@dimen/custom_margin" />
 
@@ -108,23 +130,11 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/_0"
-                android:id="@+id/tvTRTCnt"
+                android:id="@+id/tvTPLikesCnt"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/ivTReTweet"
-                android:layout_toEndOf="@+id/ivTReTweet"
-                android:layout_marginRight="@dimen/custom_margin_icon" />
+                android:layout_toRightOf="@+id/ivTPLike"
+                android:layout_toEndOf="@+id/ivTPLike" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/_0"
-                android:id="@+id/tvTLikesCnt"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/ivTLike"
-                android:layout_toEndOf="@+id/ivTLike" />
         </RelativeLayout>
-
     </LinearLayout>
-
 </LinearLayout>

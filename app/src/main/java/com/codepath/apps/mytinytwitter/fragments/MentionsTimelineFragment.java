@@ -2,12 +2,12 @@ package com.codepath.apps.mytinytwitter.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.codepath.apps.mytinytwitter.listeners.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.mytinytwitter.models.Tweet;
@@ -86,7 +86,16 @@ public class MentionsTimelineFragment extends TweetsListFragment {
         twitterClient.getMentionsTimeline(count, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Toast.makeText(getContext(), "Cannot retrieve more tweets... Try again", Toast.LENGTH_LONG).show();
+                if (statusCode == 429) {
+                    // 429 Too Many Requests
+                    Snackbar.make(getView(),
+                            "Sent too many requests exceeding Twitter Rate limit! Try again later",
+                            Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(getView(),
+                            "Problem with loading timeline... Try again later",
+                            Snackbar.LENGTH_LONG).show();
+                }
             }
 
             @Override

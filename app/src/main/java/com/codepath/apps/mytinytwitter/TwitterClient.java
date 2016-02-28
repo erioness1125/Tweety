@@ -68,6 +68,7 @@ public class TwitterClient extends OAuthBaseClient {
 		RequestParams params = new RequestParams();
 		if (count > 0)
 			params.put("count", count);
+		params.put("include_entities", "true");
 		client.get(apiUrl, params, handler);
 	}
 
