@@ -87,7 +87,6 @@ public class TweetsListFragment extends MyBaseFragment {
                 i.putExtra("myProfileImgUrl", me[0].getProfileImageUrl());
                 // launch the activity
                 startActivityForResult(i, RequestCodes.REQUEST_CODE_REPLY);
-                startActivity(i);
             }
         });
         // Attach the adapter to the RecyclerView to populate items

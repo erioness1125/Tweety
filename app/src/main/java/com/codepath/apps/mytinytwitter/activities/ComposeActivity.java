@@ -14,6 +14,7 @@ import com.codepath.apps.mytinytwitter.models.Tweet;
 import org.parceler.Parcels;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class ComposeActivity extends AppCompatActivity implements ComposeDialogFragment.ComposeDialogListener {
@@ -26,6 +27,7 @@ public class ComposeActivity extends AppCompatActivity implements ComposeDialogF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compose);
+        ButterKnife.bind(this);
 
         myProfileImgUrl = getIntent().getStringExtra("myProfileImgUrl");
 

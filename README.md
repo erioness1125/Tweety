@@ -47,6 +47,10 @@ Here's a walkthrough of implemented user stories:
 
 ![Video Walkthrough](demo_play.gif)
 
+![screenshot1](screenshot1.png)
+
+![screenshot2](screenshot2.png)
+
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
