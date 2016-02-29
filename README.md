@@ -46,7 +46,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-![Video Walkthrough](demo_play.gif)
+![Video Walkthrough](demo_play2.gif)
 
 ![screenshot1](screenshot1.png)
 
