@@ -63,11 +63,13 @@ public class TwitterClient extends OAuthBaseClient {
 
 	// GET statuses/mentions_timeline
 	// Returns the 20 most recent mentions (tweets containing a users’s @screen_name) for the authenticating user
-	public void getMentionsTimeline(int count, AsyncHttpResponseHandler handler) {
+	public void getMentionsTimeline(int count, String maxId, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/mentions_timeline.json");
 		RequestParams params = new RequestParams();
 		if (count > 0)
 			params.put("count", count);
+		if (maxId != null && !maxId.trim().isEmpty())
+			params.put("max_id", maxId);
 		params.put("include_entities", "true");
 		client.get(apiUrl, params, handler);
 	}
@@ -82,7 +84,8 @@ public class TwitterClient extends OAuthBaseClient {
 		if (userId != null && !userId.trim().isEmpty())
 			params.put("user_id", userId);
 		if (maxId != null && !maxId.trim().isEmpty())
-			params.put("maxId", maxId);
+			params.put("max_id", maxId);
+		params.put("include_entities", "true");
 		client.get(apiUrl, params, handler);
 	}
 

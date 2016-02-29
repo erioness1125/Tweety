@@ -83,7 +83,7 @@ public class MentionsTimelineFragment extends TweetsListFragment {
             clearAdapter();
         }
 
-        twitterClient.getMentionsTimeline(count, new JsonHttpResponseHandler() {
+        twitterClient.getMentionsTimeline(count, maxId, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 if (statusCode == 429) {
@@ -105,7 +105,10 @@ public class MentionsTimelineFragment extends TweetsListFragment {
                 }.getType();
                 Gson gson = MyGson.getMyGson();
                 List<Tweet> loadedTweetList = gson.fromJson(responseString, collectionType);
-                addAllToAdapter(loadedTweetList);
+                // if the size of loadedTweetList is 1, it implies that there is no more tweets to be loaded.
+                if (loadedTweetList.size() != 1) {
+                    addAllToAdapter(loadedTweetList);
+                }
             }
         });
     }

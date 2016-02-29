@@ -1,22 +1,25 @@
 package com.codepath.apps.mytinytwitter.activities;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.format.DateUtils;
+import android.text.style.ForegroundColorSpan;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.codepath.apps.mytinytwitter.R;
-import com.codepath.apps.mytinytwitter.TwitterApplication;
-import com.codepath.apps.mytinytwitter.TwitterClient;
 import com.codepath.apps.mytinytwitter.models.Tweet;
-import com.codepath.apps.mytinytwitter.models.User;
+import com.codepath.apps.mytinytwitter.utils.RequestCodes;
 
 import org.parceler.Parcels;
 
@@ -33,26 +36,22 @@ public class TweetActivity extends AppCompatActivity {
     @Bind(R.id.ivTweetProfileImg) ImageView ivTweetProfileImg;
     @Bind(R.id.ivTweetReply) ImageView ivTweetReply;
 
-    @Bind(R.id.rlReply) RelativeLayout rlReply;
-
     @Bind(R.id.tvTweetName) TextView tvTweetName;
     @Bind(R.id.tvTweetScreenName) TextView tvTweetScreenName;
     @Bind(R.id.tvTweetCreatedAt) TextView tvTweetCreatedAt;
     @Bind(R.id.tvTweetText) TextView tvTweetText;
+    @Bind(R.id.tvTweetRts) TextView tvTweetRts;
+    @Bind(R.id.tvTweetLikes) TextView tvTweetLikes;
 
     private boolean isRLReplyOn = false;
 
     private Tweet tweet;
-
-    private TwitterClient twitterClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet);
         ButterKnife.bind(this);
-
-        twitterClient = TwitterApplication.getRestClient();
 
         tweet = (Tweet) Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
 
@@ -83,7 +82,31 @@ public class TweetActivity extends AppCompatActivity {
         // actual UTF-8 text of the status update
         tvTweetText.setText(tweet.getText());
 
-        User user = (User) Parcels.unwrap(getIntent().getParcelableExtra("user"));
+        String rtCount = tweet.getRetweetCount() + " " + getString(R.string.retweets);
+        SpannableString spannableString = new SpannableString(rtCount);
+        spannableString.setSpan(
+                new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(), R.color.twitter_black)),
+                0,
+                String.valueOf(tweet.getRetweetCount()).length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvTweetRts.setText(spannableString);
+
+        String likesCount = tweet.getFavoriteCount() + " " + getString(R.string.likes);
+        spannableString = new SpannableString(likesCount);
+        spannableString.setSpan(
+                new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(), R.color.twitter_black)),
+                0,
+                String.valueOf(tweet.getFavoriteCount()).length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvTweetLikes.setText(spannableString);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            Tweet repliedTweet = Parcels.unwrap(data.getParcelableExtra("repliedTweet"));
+            Toast.makeText(this, "You have successfully replied!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");
@@ -116,25 +139,16 @@ public class TweetActivity extends AppCompatActivity {
         }
     }
 
-//    @OnClick(R.id.btnReply)
-//    void replyToTweet() {
-//        String reply = etTweetReply.getText().toString();
-//
-//
-//        twitterClient.postStatus(reply, tweet.getIdStr(), new JsonHttpResponseHandler() {
-//            @Override
-//            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//                super.onFailure(statusCode, headers, throwable, errorResponse);
-//            }
-//
-//            @Override
-//            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-////                String responseString = response.toString();
-////                Gson gson = MyGson.getMyGson();
-////                Tweet newTweet = gson.fromJson(responseString, Tweet.class);
-//
-//                Toast.makeText(getApplicationContext(), "Reply has been successfully posted!", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
+    @OnClick(R.id.ivTweetReply)
+    void replyToTweet() {
+        // create an intent to display the article
+        Intent i = new Intent(this, ReplyActivity.class);
+        // pass objects to the target activity
+        i.putExtra("inReplyToStatusId", tweet.getIdStr());
+        i.putExtra("toName", tweet.getUser().getName());
+        i.putExtra("toScreenName", tweet.getUser().getScreenName());
+        i.putExtra("myProfileImgUrl", getIntent().getStringExtra("myProfileImgUrl"));
+        // launch the activity
+        startActivityForResult(i, RequestCodes.REQUEST_CODE_REPLY);
+    }
 }

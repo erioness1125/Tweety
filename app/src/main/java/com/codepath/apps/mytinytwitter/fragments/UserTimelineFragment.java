@@ -96,6 +96,10 @@ public class UserTimelineFragment extends TweetsListFragment {
             llError.setVisibility(View.INVISIBLE);
             swipeContainer.setVisibility(View.VISIBLE);
 
+            if (maxId == null || maxId.trim().isEmpty()) {
+                clearAdapter();
+            }
+
             twitterClient.getUserTimeline(count, userId, maxId, new JsonHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
@@ -118,7 +122,11 @@ public class UserTimelineFragment extends TweetsListFragment {
                     }.getType();
                     Gson gson = MyGson.getMyGson();
                     List<Tweet> loadedTweetList = gson.fromJson(responseString, collectionType);
-                    addAllToAdapter(loadedTweetList);
+
+                    // if the size of loadedTweetList is 1, it implies that there is no more tweets to be loaded.
+                    if (loadedTweetList.size() != 1) {
+                        addAllToAdapter(loadedTweetList);
+                    }
                 }
             });
         }

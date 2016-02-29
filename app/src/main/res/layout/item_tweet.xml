@@ -20,49 +20,56 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:id="@+id/llTContainer">
+        android:weightSum="1">
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/llTWhoandWhen">
+            android:id="@+id/llTContainer">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/name"
-                android:id="@+id/tvTName"
-                android:textStyle="bold"
-                android:textColor="@color/twitter_black" />
+                android:id="@+id/llTWhoandWhen">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/screen_name"
-                android:id="@+id/tvTScreenName"
-                android:layout_marginLeft="5dp"
-                android:textColor="@color/twitter_darkgray"
-                android:textSize="12sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/name"
+                    android:id="@+id/tvTName"
+                    android:textStyle="bold"
+                    android:textColor="@color/twitter_black" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/screen_name"
+                    android:id="@+id/tvTScreenName"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="@color/twitter_darkgray"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/created_at"
+                    android:id="@+id/tvTCreatedAt"
+                    android:gravity="right"
+                    android:textColor="@color/twitter_darkgray"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/created_at"
-                android:id="@+id/tvTCreatedAt"
-                android:gravity="right"
-                android:textColor="@color/twitter_darkgray"
-                android:textSize="12sp" />
-        </LinearLayout>
+                android:id="@+id/tvTText"
+                android:linksClickable="true"
+                android:autoLink="all"
+                android:textColor="@color/twitter_black" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvTText"
-            android:linksClickable="true"
-            android:autoLink="all"
-            android:textColor="@color/twitter_black" />
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/rlTIcons"
@@ -107,7 +114,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/_0"
                 android:id="@+id/tvTRTCnt"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/ivTReTweet"
@@ -118,7 +124,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/_0"
                 android:id="@+id/tvTLikesCnt"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/ivTLike"

@@ -70,6 +70,7 @@ public class TweetsListFragment extends MyBaseFragment {
                 // pass objects to the target activity
                 i.putExtra("tweet", Parcels.wrap(tweet));
                 i.putExtra("user", Parcels.wrap(tweet.getUser()));
+                i.putExtra("myProfileImgUrl", me[0].getProfileImageUrl());
                 // launch the activity
                 startActivity(i);
             }

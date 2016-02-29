@@ -13,11 +13,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.models.Medium;
 import com.codepath.apps.mytinytwitter.models.Tweet;
+import com.codepath.apps.mytinytwitter.models.User;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,6 +36,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private Context context;
     private List<Tweet> tweetList;
+    private User me;
 
     // Define listener member variable
     private OnItemClickListener listener;
@@ -51,6 +54,11 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public TimelineAdapter(List<Tweet> tweetList) {
         this.tweetList = tweetList;
+
+        me = new Select()
+                .from(User.class)
+                .where("isMe = ?", 1)
+                .executeSingle();
     }
 
     @Override
@@ -189,9 +197,19 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         // actual UTF-8 text of the status update
         holder.tvTText.setText(tweet.getText());
 
-        // retweet and likes count
-        holder.tvTRTCnt.setText(String.valueOf(tweet.getRetweetCount()));
-        holder.tvTLikesCnt.setText(String.valueOf(tweet.getFavoriteCount()));
+        // set retweet and likes count ONLY if not 0
+        int retweetCount = tweet.getRetweetCount();
+        if (retweetCount != 0)
+            holder.tvTRTCnt.setText(String.valueOf(retweetCount));
+        int likeCount = tweet.getFavoriteCount();
+        if (likeCount != 0)
+            holder.tvTLikesCnt.setText(String.valueOf(likeCount));
+
+        // if user is self, disable ivTRT
+        if (me != null && tweet.getUser().getIdStr().equals(me.getIdStr())) {
+            holder.ivTReTweet.setImageAlpha(100);
+            holder.ivTReTweet.setClickable(false);
+        }
     }
 
     private void populatePhotoTweet(PhotoViewHolder holder, Tweet tweet) {

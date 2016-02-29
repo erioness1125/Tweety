@@ -106,18 +106,21 @@ public class HomeTimelineFragment extends TweetsListFragment {
                 }.getType();
                 Gson gson = MyGson.getMyGson();
                 List<Tweet> loadedTweetList = gson.fromJson(responseString, collectionType);
-                addAllToAdapter(loadedTweetList);
+                // if the size of loadedTweetList is 1, it implies that there is no more tweets to be loaded.
+                if (loadedTweetList.size() != 1) {
+                    addAllToAdapter(loadedTweetList);
 
-                // use Transaction to save multiple Tweets at once
-                ActiveAndroid.beginTransaction();
-                try {
-                    for (Tweet tweet : loadedTweetList) {
-                        tweet.save();
+                    // use Transaction to save multiple Tweets at once
+                    ActiveAndroid.beginTransaction();
+                    try {
+                        for (Tweet tweet : loadedTweetList) {
+                            tweet.save();
+                        }
+                        ActiveAndroid.setTransactionSuccessful();
                     }
-                    ActiveAndroid.setTransactionSuccessful();
-                }
-                finally {
-                    ActiveAndroid.endTransaction();
+                    finally {
+                        ActiveAndroid.endTransaction();
+                    }
                 }
             }
         });

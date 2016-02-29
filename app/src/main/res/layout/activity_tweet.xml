@@ -85,7 +85,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/tvTweetCreatedAt"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/custom_margin"
+        android:layout_marginBottom="@dimen/custom_margin">
 
         <TextView
             android:id="@+id/tvTweetRts"
@@ -113,7 +115,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/rlStats"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/custom_margin">
 
         <ImageView
             android:id="@+id/ivTweetReply"
@@ -156,13 +159,4 @@
             android:src="@drawable/ic_keyboard_control_24dp" />
     </LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/rlReply"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/llIcons">
-
-    </RelativeLayout>
 </RelativeLayout>
