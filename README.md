@@ -39,7 +39,8 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* List anything else that you can get done to improve the app functionality!
+* [x] Color Screen names and/or hashtags in the tagline(=description) of the user profile
 
 ## Video Walkthrough 
 
