@@ -92,4 +92,8 @@ public class MyBaseFragment extends Fragment {
         }
         return false;
     }
+
+    public User getMe() {
+        return me[0];
+    }
 }

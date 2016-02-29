@@ -54,13 +54,13 @@ public class UserTimelineFragment extends TweetsListFragment {
             public void onLoadMore(int page, int totalItemsCount) {
                 Tweet lastTweet = mTweetList.get(mTweetList.size() - 1);
                 nextMaxId = lastTweet.getIdStr();
-                populateTimeline(tweetsCount);
+                populateTimeline(tweetsCount, nextMaxId);
             }
         });
         /********************** end of RecyclerView **********************/
 
         // first request
-        populateTimeline(tweetsCount);
+        populateTimeline(tweetsCount, null);
 
         return view;
     }
@@ -77,7 +77,7 @@ public class UserTimelineFragment extends TweetsListFragment {
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                populateTimeline(tweetsCount);
+                populateTimeline(tweetsCount, null);
                 swipeContainer.setRefreshing(false);
             }
         }, 1000);
@@ -85,7 +85,7 @@ public class UserTimelineFragment extends TweetsListFragment {
 
     // 1. send an API request to get the timeline json
     // 2. fill the RecyclerView by creating the tweet objects from the json
-    private void populateTimeline(int count) {
+    private void populateTimeline(int count, String maxId) {
         String userId = getArguments().getString(getContext().getString(R.string.userid));
 
         if (!isNetworkAvailable() || !isOnline()) {
@@ -96,7 +96,7 @@ public class UserTimelineFragment extends TweetsListFragment {
             llError.setVisibility(View.INVISIBLE);
             swipeContainer.setVisibility(View.VISIBLE);
 
-            twitterClient.getUserTimeline(count, userId, new JsonHttpResponseHandler() {
+            twitterClient.getUserTimeline(count, userId, maxId, new JsonHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     if (statusCode == 429) {

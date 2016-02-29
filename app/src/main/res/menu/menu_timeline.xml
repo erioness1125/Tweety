@@ -10,10 +10,26 @@
         app:actionViewClass="android.support.v7.widget.SearchView" />
 
     <item
-        android:id="@+id/miProfile"
+        android:id="@+id/miCompose"
         android:orderInCategory="2"
+        android:icon="@drawable/ic_create_24dp"
+        android:title="@string/profile"
+        android:onClick="onComposeTweet"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/miProfile"
+        android:orderInCategory="3"
         android:icon="@drawable/ic_profile"
         android:title="@string/profile"
         android:onClick="onProfileView"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/miActionProgress"
+        android:title="Loading..."
+        android:visible="false"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom"
+        app:actionLayout="@layout/action_view_progress" />
 </menu>

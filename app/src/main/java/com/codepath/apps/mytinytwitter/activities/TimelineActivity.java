@@ -12,12 +12,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 
+import com.activeandroid.query.Select;
 import com.astuetz.PagerSlidingTabStrip;
 import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.adapters.SmartFragmentStatePagerAdapter;
 import com.codepath.apps.mytinytwitter.fragments.HomeTimelineFragment;
 import com.codepath.apps.mytinytwitter.fragments.MentionsTimelineFragment;
+import com.codepath.apps.mytinytwitter.fragments.TweetsListFragment;
+import com.codepath.apps.mytinytwitter.models.Tweet;
+import com.codepath.apps.mytinytwitter.models.User;
+import com.codepath.apps.mytinytwitter.utils.RequestCodes;
+
+import org.parceler.Parcels;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,6 +34,8 @@ public class TimelineActivity extends AppCompatActivity {
 
     @Bind(R.id.viewpager) ViewPager viewPager;
     @Bind(R.id.tabs) PagerSlidingTabStrip tabStrip;
+
+    MenuItem miActionProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +81,54 @@ public class TimelineActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Store instance of the menu item containing progress
+        miActionProgress = menu.findItem(R.id.miActionProgress);
+        // Extract the action-view from the menu item
+        ProgressBar v =  (ProgressBar) MenuItemCompat.getActionView(miActionProgress);
+        // Return to finish
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            int index = viewPager.getCurrentItem();
+            TweetsPagerAdapter adapter = ((TweetsPagerAdapter) viewPager.getAdapter());
+            TweetsListFragment fragment = (TweetsListFragment) adapter.getRegisteredFragment(index);
+            Tweet tweet = null;
+
+            if (requestCode == RequestCodes.REQUEST_CODE_COMPOSE) {
+                tweet = Parcels.unwrap(data.getParcelableExtra("composedTweet"));
+                fragment.add(0, tweet);
+            }
+            else if (requestCode == RequestCodes.REQUEST_CODE_REPLY) {
+                tweet = Parcels.unwrap(data.getParcelableExtra("repliedTweet"));
+                fragment.add(0, tweet);
+            }
+
+            fragment.getRvTweets().getLayoutManager().scrollToPosition(0);
+        }
+    }
+
     public void onProfileView(MenuItem item) {
         // launch the profile view
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
+    }
+
+    public void onComposeTweet(MenuItem item) {
+        // launch the Compose view
+        Intent intent = new Intent(this, ComposeActivity.class);
+
+        User me = new Select()
+                .from(User.class)
+                .where("isMe = ?", 1)
+                .executeSingle();
+
+        intent.putExtra("myProfileImgUrl", me.getProfileImageUrl());
+        startActivityForResult(intent, RequestCodes.REQUEST_CODE_COMPOSE);
     }
 
     // return the order of the fragments in the viewpager

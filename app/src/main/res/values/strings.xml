@@ -24,5 +24,6 @@
     <string name="retweets">RETWEETS</string>
     <string name="likes">LIKES</string>
     <string name="_0">0</string>
+    <string name="inReplyTo">In reply to</string>
 
 </resources>

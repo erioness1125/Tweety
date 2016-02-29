@@ -42,6 +42,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public interface OnItemClickListener {
         void onProfilePicClick(View itemView, int position);
         void onTweetContainerClick(View itemView, int position);
+        void onReplyClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -129,6 +130,12 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void addAll(List<Tweet> tweetList) {
         this.tweetList.addAll(tweetList);
         notifyDataSetChanged();
+    }
+
+    // Add a list of items
+    public void add(int idx, Tweet tweet) {
+        this.tweetList.add(idx, tweet);
+        notifyItemInserted(idx);
     }
 
     public void setTweetList(List<Tweet> tweetList) {
@@ -289,6 +296,15 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         listener.onTweetContainerClick(itemView, getLayoutPosition());
                 }
             });
+
+            ivTReply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Triggers click upwards to the adapter on click
+                    if (listener != null)
+                        listener.onReplyClick(getLayoutPosition());
+                }
+            });
         }
     }
 
@@ -336,6 +352,15 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     // Triggers click upwards to the adapter on click
                     if (listener != null)
                         listener.onTweetContainerClick(itemView, getLayoutPosition());
+                }
+            });
+
+            ivTPReply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Triggers click upwards to the adapter on click
+                    if (listener != null)
+                        listener.onReplyClick(getLayoutPosition());
                 }
             });
         }

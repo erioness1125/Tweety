@@ -12,10 +12,12 @@ import android.widget.LinearLayout;
 
 import com.codepath.apps.mytinytwitter.R;
 import com.codepath.apps.mytinytwitter.activities.ProfileActivity;
+import com.codepath.apps.mytinytwitter.activities.ReplyActivity;
 import com.codepath.apps.mytinytwitter.activities.TweetActivity;
 import com.codepath.apps.mytinytwitter.adapters.TimelineAdapter;
 import com.codepath.apps.mytinytwitter.models.Tweet;
 import com.codepath.apps.mytinytwitter.utils.DividerItemDecoration;
+import com.codepath.apps.mytinytwitter.utils.RequestCodes;
 
 import org.parceler.Parcels;
 
@@ -71,6 +73,22 @@ public class TweetsListFragment extends MyBaseFragment {
                 // launch the activity
                 startActivity(i);
             }
+
+            @Override
+            public void onReplyClick(int position) {
+                // create an intent to display the article
+                Intent i = new Intent(getActivity(), ReplyActivity.class);
+                // get the article to display
+                Tweet tweet = mTweetList.get(position);
+                // pass objects to the target activity
+                i.putExtra("inReplyToStatusId", tweet.getIdStr());
+                i.putExtra("toName", tweet.getUser().getName());
+                i.putExtra("toScreenName", tweet.getUser().getScreenName());
+                i.putExtra("myProfileImgUrl", me[0].getProfileImageUrl());
+                // launch the activity
+                startActivityForResult(i, RequestCodes.REQUEST_CODE_REPLY);
+                startActivity(i);
+            }
         });
         // Attach the adapter to the RecyclerView to populate items
         rvTweets.setAdapter(adapter);
@@ -99,12 +117,19 @@ public class TweetsListFragment extends MyBaseFragment {
         getMyUserInfo();
     }
 
-    protected void addAllToAdapter(List<Tweet> tweetList) {
-        adapter.addAll(tweetList);
-        adapter.notifyItemRangeInserted(mTweetList.size() - 1, tweetList.size());
+    public void add(int idx, Tweet tweet) {
+        adapter.add(idx, tweet);
     }
 
-    protected void clearAdapter() {
+    public void addAllToAdapter(List<Tweet> tweetList) {
+        adapter.addAll(tweetList);
+    }
+
+    public void clearAdapter() {
         adapter.clear();
+    }
+
+    public RecyclerView getRvTweets() {
+        return rvTweets;
     }
 }

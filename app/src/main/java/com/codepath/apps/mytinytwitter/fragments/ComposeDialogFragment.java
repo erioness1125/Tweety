@@ -11,7 +11,6 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -45,6 +44,7 @@ public class ComposeDialogFragment extends DialogFragment {
     private static final int MAX_CHARS = 140;
 
     private int numChars = MAX_CHARS;
+    private String inReplyToStatusId;
 
     private Context context;
     private TwitterClient twitterClient;
@@ -60,12 +60,15 @@ public class ComposeDialogFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static ComposeDialogFragment newInstance(String profileImgUrl) {
+    public static ComposeDialogFragment newInstance(String inReplyToStatusId, String toScreenName, String myProfileImgUrl) {
         ComposeDialogFragment fragment = new ComposeDialogFragment();
         fragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
         Bundle args = new Bundle();
-        args.putString("profileImgUrl", profileImgUrl);
+        if (toScreenName != null && !toScreenName.trim().isEmpty())
+            args.putString("toScreenName", toScreenName);
+        args.putString("myProfileImgUrl", myProfileImgUrl);
         fragment.setArguments(args);
+        fragment.inReplyToStatusId = inReplyToStatusId;
         return fragment;
     }
 
@@ -84,9 +87,9 @@ public class ComposeDialogFragment extends DialogFragment {
         context = getContext();
         twitterClient = TwitterApplication.getRestClient();
 
-        String profileImgUrl = getArguments().getString("profileImgUrl");
+        String myProfileImgUrl = getArguments().getString("myProfileImgUrl");
         Glide.with(context)
-                .load(profileImgUrl)
+                .load(myProfileImgUrl)
                 .asBitmap()
                 .fitCenter()
                 .into(new BitmapImageViewTarget(ivMyProfileImg) {
@@ -102,16 +105,19 @@ public class ComposeDialogFragment extends DialogFragment {
         // by default, the btnTweet is disabled
         toggleButton(false);
 
+        String toScreenName = getArguments().getString("toScreenName");
+        if (toScreenName != null) {
+            toScreenName = getString(R.string.at) + toScreenName;
+            etNewTweet.setText(toScreenName);
+        }
         // Show soft keyboard automatically and request focus to field
         etNewTweet.requestFocus();
-        getDialog().getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     @OnClick(R.id.btnTweet)
     void onClickBtnTweet() {
         String status = etNewTweet.getText().toString();
-        twitterClient.postStatus(status, null, new JsonHttpResponseHandler() {
+        twitterClient.postStatus(status, this.inReplyToStatusId, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
@@ -126,8 +132,6 @@ public class ComposeDialogFragment extends DialogFragment {
                 // Return newTweet back to activity through the implemented listener
                 ComposeDialogListener listener = (ComposeDialogListener) getActivity();
                 listener.onFinishComposeDialog(newTweet);
-
-                dismiss();
             }
         });
     }
